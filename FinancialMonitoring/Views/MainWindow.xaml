@@ -1,0 +1,104 @@
+﻿<Window x:Class="FinancialMonitoring.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:FinancialMonitoring.Converters"
+        xmlns:chart="clr-namespace:De.TorstenMandelkow.MetroChart;assembly=De.TorstenMandelkow.MetroChart" 
+        Title="Financial Monitoring" Height="495" Width="803"
+        MinHeight="495" MinWidth="803">
+    <Window.Resources>
+        <converters:BoolVisiblityConverter x:Key="BoolVisiblityConverter" />
+    </Window.Resources>
+    <Grid>
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem Header="Overview">
+                <Grid Background="#FFE5E5E5">
+                    <GroupBox Header="Filter Options" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="90" Width="495">
+                        <Grid HorizontalAlignment="Stretch" Margin="0,0,-12,0" VerticalAlignment="Stretch">
+                            <RadioButton Content="by Month" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" IsChecked="{Binding FilterByMonth, Mode=TwoWay}"/>
+                            <RadioButton Content="by Date range" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top" IsChecked="{Binding FilterByDateRange, Mode=TwoWay}"/>
+                            <Grid HorizontalAlignment="Stretch" Margin="178,0,85,0" VerticalAlignment="Stretch" Visibility="{Binding ShowMonthFilter, Mode=TwoWay, Converter={StaticResource BoolVisiblityConverter}}">
+                                <ComboBox HorizontalAlignment="Left" Margin="63,9,0,0" VerticalAlignment="Top" Width="160" ItemsSource="{Binding Monthses}" SelectedItem="{Binding SelectedMonth}"/>
+                                <Label Content="Month:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid HorizontalAlignment="Stretch" Margin="178,0,85,0" VerticalAlignment="Stretch" Visibility="{Binding ShowDaterangeFilter, Mode=TwoWay, Converter={StaticResource BoolVisiblityConverter}}">
+                                <Label Content="Start date:" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
+                                <Label Content="End date:" HorizontalAlignment="Left" Margin="10,32,0,0" VerticalAlignment="Top"/>
+                                <DatePicker HorizontalAlignment="Left" Margin="79,7,0,0" VerticalAlignment="Top" Width="147" SelectedDate="{Binding FilterStartDate}"/>
+                                <DatePicker HorizontalAlignment="Left" Margin="79,36,0,0" VerticalAlignment="Top" Width="147" SelectedDate="{Binding FilterEndDate}"/>
+                            </Grid>
+                            <Button Margin="415,10,35,10" Command="{Binding FilterCommand}">
+                                <Image Source="../Resources/filter.png"/>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                    <chart:PieChart
+                                ChartTitle="Finances"
+                                ChartSubTitle="Your finances grouped by categories."
+                                Margin="10,54,10,10">
+                        <chart:PieChart.Series>
+                            <chart:ChartSeries
+                                        SeriesTitle="Finances"
+                                        DisplayMember="Category"
+                                        ValueMember="Amount"
+                                        ItemsSource="{Binding Path=OverViewPaymentRecords}" />
+                        </chart:PieChart.Series>
+                    </chart:PieChart>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Records">
+                <Grid Background="#FFE5E5E5">
+                    <GroupBox Header="Manage Records" HorizontalAlignment="Stretch" Margin="15,10,10,10" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Label Content="Date:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.526,-1.654"/>
+                            <Label Content="Amount:" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.526,-1.654"/>
+                            <Label Content="Subject:" HorizontalAlignment="Left" Margin="299,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.526,-1.654"/>
+                            <Label Content="Category:" HorizontalAlignment="Left" Margin="444,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.526,-1.654"/>
+                            <DatePicker HorizontalAlignment="Left" Margin="10,41,0,0" VerticalAlignment="Top" Width="120" SelectedDate="{Binding PaymentRecordToAdd.Date}"/>
+                            <TextBox HorizontalAlignment="Left" Height="23" Margin="154,41,0,0" TextWrapping="Wrap" Text="{Binding PaymentRecordToAdd.Amount}" VerticalAlignment="Top" Width="120"  />
+                            <TextBox HorizontalAlignment="Left" Height="23" Margin="299,41,0,0" TextWrapping="Wrap" Text="{Binding PaymentRecordToAdd.Subject}" VerticalAlignment="Top" Width="120"/>
+                            <ComboBox HorizontalAlignment="Left" Margin="444,41,0,0" VerticalAlignment="Top" Width="120" ItemsSource="{Binding Categories}" SelectedItem="{Binding PaymentRecordToAdd.Category}"/>
+                            <Button HorizontalAlignment="Left" Margin="588,18,0,0" VerticalAlignment="Top" Width="45" Height="45" Command="{Binding AddPaymentRecordCommand}">
+                                <Image Source="../Resources/add2.png"/>
+                            </Button>
+                            <DataGrid HorizontalAlignment="Stretch" Margin="10,70,10,10" VerticalAlignment="Stretch" RenderTransformOrigin="-1.5,-3" ItemsSource="{Binding PaymentRecords}" SelectedItem="{Binding SelectedPaymentRecord}"
+                                      ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd.MM.yy\}}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" IsReadOnly="True"/>
+                                    <DataGridTextColumn Header="Category" Binding="{Binding Category}" IsReadOnly="True"/>
+                                </DataGrid.Columns>
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu >
+                                        <MenuItem Header="Remove Record" Command="{Binding RemovePaymentRecordCommand}">
+                                            <MenuItem.Icon>
+                                                <Image Source="../Resources/delete2.png"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Configuration">
+                <Grid Background="#FFE5E5E5">
+                    <GroupBox Header="Categories" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="383" Width="278">
+                        <Grid Margin="0,0,0,-12">
+                            <ListBox HorizontalAlignment="Left" Height="214" Margin="10,10,0,0" VerticalAlignment="Top" Width="246" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory}" />
+                            <Label Content="Name:" Margin="10,229,10,117"/>
+                            <TextBox Margin="11,259,10,87" Height="25" Text="{Binding NewCategory}" />
+                            <Button Margin="161,289,60,37" Height="45" Command="{Binding RemoveCategoryCommand}">
+                                <Image Source="../Resources/delete2.png"/>
+                            </Button>
+                            <Button Margin="211,289,10,37" Height="45" Command="{Binding AddCategoryCommand}">
+                                <Image Source="../Resources/add2.png"/>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
