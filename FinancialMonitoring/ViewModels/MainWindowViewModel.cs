@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Commands.Commands;
 using FinancialMonitoring.DataAccessLayer;
@@ -18,26 +14,26 @@ namespace FinancialMonitoring.ViewModels
     {
         private readonly IDataAccessLayer _database;
         private readonly IFinacesService _finacesService;
-
-        private Category _selectedCategory;
-        private List<Category> _categories;
-        private string _newCategory;
         private ICommand _addCategoryCommand;
-        private ICommand _removeCategoryCommand;
-        private PaymentRecord _paymentRecordToAdd;
         private ICommand _addPaymentRecordCommand;
-        private List<PaymentRecord> _paymentRecords;
-        private PaymentRecord _selectedPaymentRecord;
-        private ICommand _removePaymentRecordCommand;
-        private bool? _filterByMonth = true;
+
+        private List<Category> _categories;
         private bool? _filterByDaterange = false;
-        private bool _showMonthFilter = true;
-        private bool _showDaterangeFilter;
-        private Months _selectedMonth = InitCurrentMonth();
+        private bool? _filterByMonth = true;
         private ICommand _filterCommand;
-        private List<PaymentRecord> _overViewPaymentRecords;
-        private DateTime _filterStartDate = DateTime.Now;
         private DateTime _filterEndDate = DateTime.Now;
+        private DateTime _filterStartDate = DateTime.Now;
+        private string _newCategory;
+        private List<PaymentRecord> _overViewPaymentRecords;
+        private PaymentRecord _paymentRecordToAdd;
+        private List<PaymentRecord> _paymentRecords;
+        private ICommand _removeCategoryCommand;
+        private ICommand _removePaymentRecordCommand;
+        private Category _selectedCategory;
+        private Months _selectedMonth = InitCurrentMonth();
+        private PaymentRecord _selectedPaymentRecord;
+        private bool _showDaterangeFilter;
+        private bool _showMonthFilter = true;
 
         public MainWindowViewModel(IDataAccessLayer dataAccessLayer, IFinacesService finacesService)
         {
@@ -84,7 +80,7 @@ namespace FinancialMonitoring.ViewModels
                 }
             }
         }
-        
+
         public string NewCategory
         {
             get { return _newCategory; }
@@ -102,7 +98,7 @@ namespace FinancialMonitoring.ViewModels
         {
             get { return _addCategoryCommand = _addCategoryCommand ?? new DelegateCommand(AddCategory); }
         }
-        
+
         public ICommand RemoveCategoryCommand
         {
             get { return _removeCategoryCommand = _removeCategoryCommand ?? new DelegateCommand(RemoveCategory); }
@@ -123,10 +119,7 @@ namespace FinancialMonitoring.ViewModels
 
         public ICommand AddPaymentRecordCommand
         {
-            get
-            {
-                return _addPaymentRecordCommand = _addPaymentRecordCommand ?? new DelegateCommand(AddPaymentRecord);
-            }
+            get { return _addPaymentRecordCommand = _addPaymentRecordCommand ?? new DelegateCommand(AddPaymentRecord); }
         }
 
         public List<PaymentRecord> PaymentRecords
@@ -229,7 +222,7 @@ namespace FinancialMonitoring.ViewModels
         {
             get
             {
-                return Enum.GetValues(typeof(Months))
+                return Enum.GetValues(typeof (Months))
                     .Cast<Months>();
             }
         }
@@ -334,14 +327,16 @@ namespace FinancialMonitoring.ViewModels
                 }
                 else
                 {
-                    MessageBox.Show("You can not delete a category which is linked to a payment record!", "Waring", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("You can not delete a category which is linked to a payment record!", "Waring",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }
 
         private void AddPaymentRecord(object obj)
         {
-            if (_paymentRecordToAdd.Amount > 0 && !string.IsNullOrEmpty(_paymentRecordToAdd.Subject) && _paymentRecordToAdd.Category != null)
+            if (_paymentRecordToAdd.Amount > 0 && !string.IsNullOrEmpty(_paymentRecordToAdd.Subject) &&
+                _paymentRecordToAdd.Category != null)
             {
                 _database.Insert(_paymentRecordToAdd);
 
@@ -369,8 +364,8 @@ namespace FinancialMonitoring.ViewModels
 
         private bool CategoryNotLinked()
         {
-            var resultList = _database.GetPaymentRecord<PaymentRecord>(_selectedCategory);
-            
+            List<PaymentRecord> resultList = _database.GetPaymentRecord<PaymentRecord>(_selectedCategory);
+
             return resultList.Count == 0;
         }
 
@@ -394,9 +389,9 @@ namespace FinancialMonitoring.ViewModels
 
         private static Months InitCurrentMonth()
         {
-            var month = DateTime.Now.Month;
+            int month = DateTime.Now.Month;
 
-            foreach (Months m in Enum.GetValues(typeof(Months)).Cast<Months>())
+            foreach (Months m in Enum.GetValues(typeof (Months)).Cast<Months>())
             {
                 if ((int) m == month)
                 {
